@@ -39,7 +39,7 @@ def dashboard():
     chart_values = [round(float(b), 4) for b in bobot_ahp]
 
     return render_template(
-        'dashboard.html', 
+        'index.html', 
         top_desa=top_desa,
         top_score=top_score,
         total=total_desa,
@@ -235,3 +235,4 @@ if __name__ == '__main__':
     print("   Buka browser: http://127.0.0.1:5000/    ")
     print("===========================================")
     app.run(debug=True)
+
