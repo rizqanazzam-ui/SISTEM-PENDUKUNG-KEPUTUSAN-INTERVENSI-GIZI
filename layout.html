@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SPK Intervensi Gizi | Hybrid AHP-SAW</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #0d6efd 0%, #0043a8 100%);
+            --bg-body: #f4f7f6;
+            --text-dark: #2c3e50;
+        }
+
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: var(--bg-body); 
+            color: #555; 
+        }
+        
+        /* Navbar Modern */
+        .navbar { 
+            background: var(--primary-gradient); 
+            padding: 15px 0; 
+            box-shadow: 0 4px 15px rgba(13, 110, 253, 0.2); 
+        }
+
+        .navbar-brand { 
+            font-weight: 700; 
+            letter-spacing: 1px; 
+            font-size: 1.4rem; 
+        }
+
+        .nav-link { 
+            color: rgba(255, 255, 255, 0.85) !important; 
+            margin-left: 15px; 
+            transition: 0.3s; 
+        }
+
+        .nav-link:hover { 
+            color: #fff !important; 
+            font-weight: 600; 
+            transform: scale(1.05); 
+        }
+
+        /* TEKS SAAT HALAMAN AKTIF - LEBIH TERANG */
+        .nav-link.active {
+            color: #ffffff !important;
+            font-weight: 700;
+            text-shadow: 0 0 6px rgba(255,255,255,0.75);
+            transform: scale(1.07);
+        }
+
+        /* Kartu (Card) */
+        .card { 
+            border: none; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); 
+            transition: 0.3s; 
+            overflow: hidden; 
+        }
+
+        .card:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); 
+        }
+
+        /* Tabel */
+        .table thead th { 
+            background-color: #f8f9fa; 
+            color: var(--text-dark); 
+            font-weight: 600; 
+            border-bottom: 2px solid #e9ecef; 
+            text-transform: uppercase; 
+            font-size: 0.85rem; 
+            padding: 15px; 
+        }
+
+        .table tbody td { padding: 15px; vertical-align: middle; }
+        
+        /* Badge Ranking */
+        .badge-rank-1 { 
+            background: #ffd700; 
+            color: #fff; 
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2); 
+        }
+        
+        /* Footer */
+        footer { 
+            margin-top: 50px; 
+            padding: 25px 0; 
+            text-align: center; 
+            font-size: 0.9rem; 
+            color: #888; 
+            background-color: #fff; 
+            border-top: 1px solid #e9ecef; 
+        }
+        
+        /* Tombol */
+        .btn-primary { 
+            background: var(--primary-gradient); 
+            border: none; 
+            padding: 10px 25px; 
+            transition: 0.3s; 
+        }
+
+        .btn-primary:hover { 
+            opacity: 0.9; 
+            box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3); 
+        }
+    </style>
+  </head>
+  <body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+      <div class="container">
+        <a class="navbar-brand" href="/">
+            <i class="bi bi-activity"></i> SPK GIZI
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="/">Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link" href="/bobot">Bobot AHP</a></li>
+            <li class="nav-item"><a class="nav-link" href="/input">Input Data</a></li>
+            <li class="nav-item"><a class="nav-link" href="/hasil">Hasil Perangkingan</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container py-5">
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer>
+        <div class="container">
+            &copy; 2025 Sistem Penunjang Keputusan - Kelompok 12 <br>
+            Metode Hybrid AHP & SAW
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- SCRIPT UNTUK MENANDAI NAVBAR YANG SEDANG AKTIF -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+          const currentPath = window.location.pathname;
+
+          document.querySelectorAll('.nav-link').forEach(link => {
+              if (link.getAttribute('href') === currentPath) {
+                  link.classList.add('active');
+              }
+          });
+      });
+    </script>
+
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

@@ -1,0 +1,92 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold text-dark">Hasil Perangkingan</h2>
+        <p class="text-muted">Urutan desa prioritas berdasarkan perhitungan Hybrid AHP-SAW.</p>
+    </div>
+    <button onclick="window.print()" class="btn btn-outline-dark">
+        <i class="bi bi-printer"></i> Cetak Laporan
+    </button>
+</div>
+
+<div class="card p-4 shadow-sm">
+    <div class="table-responsive">
+        <table id="tabelSPK" class="table table-hover align-middle" style="width:100%">
+            <thead class="table-light">
+                <tr>
+                    <th class="text-center" width="5%">Rank</th>
+                    <th width="40%">Nama Desa</th>
+                    <th width="20%">Skor Akhir</th>
+                    <th width="35%">Visualisasi Skor</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                <tr>
+                    <td class="text-center">
+                        {% if row.Ranking == 1 %}
+                            <span class="badge bg-warning text-dark fs-6 rounded-circle p-2 shadow-sm">🥇</span>
+                        {% elif row.Ranking == 2 %}
+                            <span class="badge bg-secondary text-white fs-6 rounded-circle p-2 shadow-sm">🥈</span>
+                        {% elif row.Ranking == 3 %}
+                            <span class="badge text-white fs-6 rounded-circle p-2 shadow-sm" style="background:#cd7f32">🥉</span>
+                        {% else %}
+                            <span class="fw-bold text-secondary">#{{ row.Ranking }}</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="fw-semibold">{{ row.Desa }}</td>
+
+                    <td class="fw-bold text-primary font-monospace">{{ "%.4f"|format(row.Skor_Akhir) }}</td>
+
+                    <td>
+                        <div class="progress" style="height: 10px; border-radius: 10px;">
+                            <div class="progress-bar 
+                                {% if row.Ranking <= 3 %} bg-danger 
+                                {% elif row.Ranking <= 10 %} bg-warning 
+                                {% else %} bg-success {% endif %}" 
+                                role="progressbar" 
+                                style="width: {{ row.Skor_Akhir * 100 }}%">
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        $('#tabelSPK').DataTable({
+            // PENTING: Matikan pengurutan otomatis awal agar Ranking 1 tetap diatas
+            "order": [], 
+            
+            // Konfigurasi Bahasa Indonesia
+            "language": {
+                "search": "Cari Desa:",
+                "lengthMenu": "Tampilkan _MENU_ desa per halaman",
+                "info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ desa",
+                "paginate": {
+                    "next": "Lanjut",
+                    "previous": "Kembali"
+                },
+                "zeroRecords": "Data tidak ditemukan",
+            },
+            
+            "pageLength": 10, // Jumlah data per halaman default
+            
+            // Mematikan fitur sort pada kolom progress bar (Visualisasi Skor)
+            "columnDefs": [
+                // Target diubah ke 3 karena kolom berkurang 1 (0:Rank, 1:Desa, 2:Skor, 3:Visual)
+                { "orderable": false, "targets": 3 } 
+            ]
+        });
+    });
+</script>
+{% endblock %}
