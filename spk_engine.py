@@ -4,9 +4,14 @@ import os
 import json
 
 # ==========================================
-# KONFIGURASI
+# KONFIGURASI PATH BARU
 # ==========================================
-FILE_PATH = r"D:\TEKNIK KOMPUTER\S5\Sistem Pengambilan keputusan\SPK\Artikel\AXCEL_PROJEK_SPK_KELOMPOK_12.xlsx"
+# Menentukan direktori dasar (root folder proyek Anda di server)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__)) 
+
+# Perbaikan: Menggunakan path absolut relatif yang mengarah ke folder Artikel
+FILE_PATH = os.path.join(BASE_DIR, 'Artikel', 'AXCEL_PROJEK_SPK_KELOMPOK_12.xlsx')
+
 SHEET_NAME = " ProsesingSAW"
 CONFIG_FILE = "ahp_config.json" # File baru untuk simpan matriks
 
@@ -64,9 +69,12 @@ def get_ahp_weights():
     bobot = matriks_norm.mean(axis=1)
 
     # Uji Konsistensi
+    # Perlu penanganan untuk n=1 atau n=2, namun RI_dict sudah menanganinya
     weighted_sum = matriks @ bobot
     lambda_max = (weighted_sum / bobot).mean()
     CI = (lambda_max - n) / (n - 1)
+    
+    # Random Index (RI) sesuai ukuran matriks (n=6)
     RI_dict = {1: 0, 2: 0, 3: 0.58, 4: 0.90, 5: 1.12, 6: 1.24}
     RI = RI_dict.get(n, 1.24)
     CR = CI / RI if RI != 0 else 0
@@ -82,10 +90,12 @@ def get_ahp_weights():
     return bobot, konsistensi_data, matriks
 
 def run_spk_calculation():
+    # Perbaikan: Tambahkan penanganan error yang lebih spesifik jika file tidak ditemukan
     if not os.path.exists(FILE_PATH):
-        # Buat dummy jika file tidak ada (untuk handling error awal)
-        return pd.DataFrame(), [], {'Status': 'Error', 'CR': 0}
+        # Mengembalikan data dummy agar dashboard tidak crash saat file data tidak ada
+        return pd.DataFrame({'Desa': []}), [0,0,0,0,0,0], {'Status': 'File Not Found', 'CR': 0}
 
+    # Pembacaan file Excel
     df = pd.read_excel(FILE_PATH, sheet_name=SHEET_NAME)
     df = df.drop_duplicates(subset=["Desa"], keep='first')
 
@@ -94,8 +104,10 @@ def run_spk_calculation():
     normalisasi = df[KRITERIA].copy()
     for i, col in enumerate(KRITERIA):
         if JENIS_KRITERIA[i] == True:
+            # Kriteria Benefit (lebih besar lebih baik)
             normalisasi[col] = df[col] / df[col].max()
         else:
+            # Kriteria Cost (lebih kecil lebih baik)
             normalisasi[col] = df[col].min() / df[col]
 
     df['Skor_Akhir'] = (normalisasi * bobot_ahp).sum(axis=1)
